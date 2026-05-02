@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UPV Tricycle Optimization</title>
+
+    <link rel="stylesheet" href="./css/style.css" />
+    <script type="module" src="./js/script.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>UPV Tricycle Optimization</h1>
+        <nav>
+            <a href="./">Home</a>
+            <a href="./members.html">Members</a>
+            <a href="./about.html">About</a>
+            <a href="./contact.html">Contact Us</a>
+        </nav>
+    </header>
+
+    <main>
+        <p>
+            Yow paldo math 140 brrrrrkfldsjfksjdl
+            flsdfjsfsjdfklsdjfklsjdklfjslfjksdjfklsdjlfjsdfjskdjfklsdjfkldsj
+            fkjdslfjksldjfjflsdkfjskdf
+        </p>
+
+        <section class="controls" aria-label="Trip settings">
+            <div class="field">
+                <label for="terminal">Choose Starting Terminal:</label>
+                <select id="terminal" name="terminal">
+                    <option value="A">Dorm Terminal</option>
+                    <option value="M">CAS Terminal</option>
+                    <option value="S">Banwa Terminal</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="endingTerminal">Choose Ending Terminal:</label>
+                <select id="endingTerminal" name="endingTerminal">
+                    <option value="A">Dorm Terminal</option>
+                    <option value="M">CAS Terminal</option>
+                    <option value="S">Banwa Terminal</option>
+                </select>
+            </div>
+
+
+            <div class="field">
+                <label for="dropoffCount">Number of drop-off points:</label>
+                <select id="dropoffCount" name="dropoffCount">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+        </section>
+
+        <section class="dropoffs" aria-label="Drop-off points">
+            <div id="dropoffContainer" aria-live="polite"></div>
+        </section>
+
+        <button id="computeBtn" type="button">Compute Route</button>
+
+        <pre id="output" aria-live="polite"></pre>
+    </main>
+
+
+
+    <footer>
+        <p>Math 140 practical application study</p>
+    </footer>
+</body>
+
+</html>
