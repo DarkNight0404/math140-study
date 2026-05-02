@@ -1,21 +1,169 @@
-* {
-  margin: 0;
-  padding: 0;
+/* =========================
+   Base / Reset
+   ========================= */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
-  background-color: color;
 }
 
+html,
 body {
-    display: grid;
-    grid-template-columns: 250px 1fr;
-    grid-template-rows: auto 1fr auto;
-    height: 100vh;
+  height: 100%;
 }
 
-header {
-  grid-column: 1 / 3;
+body,
+h1,
+p {
+  margin: 0;
 }
 
+/* =========================
+   Theme variables
+   ========================= */
+:root {
+  --bg: #f7f7fb;
+  --surface: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --gap: 16px;
+  --radius: 10px;
+  --max-content: 1000px;
+  --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* =========================
+   Layout
+   ========================= */
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+
+  display: grid;
+  grid-template-columns: 250px 1fr; /* left column reserved (sidebar later) */
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  gap: var(--gap);
+  padding: var(--gap);
+}
+
+/* Header/Footer span full width */
+header,
 footer {
-  grid-column: 1 / 3;
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px var(--gap);
+}
+
+/* Main content area */
+main {
+  grid-column: 2 / 3; /* right column */
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--gap);
+}
+
+/* Optional: left column placeholder (if you add an <aside>) */
+aside {
+  grid-column: 1 / 2;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--gap);
+}
+
+/* =========================
+   Header / Nav
+   ========================= */
+header h1 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+nav {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: var(--text);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+nav a:hover {
+  background: #f1f5f9;
+}
+
+/* =========================
+   Form styling (your controls)
+   ========================= */
+.controls {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column; /* label above select */
+  gap: 6px;
+}
+
+.field label {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+select,
+button {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+button {
+  cursor: pointer;
+  width: fit-content;
+}
+
+button:hover {
+  background: #f8fafc;
+}
+
+/* Output box */
+#output {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: #fbfbff;
+  overflow: auto;
+}
+
+/* =========================
+   Responsive: collapse to one column on small screens
+   ========================= */
+@media (max-width: 800px) {
+  body {
+    grid-template-columns: 1fr;
+  }
+
+  main {
+    grid-column: 1 / -1;
+  }
+
+  aside {
+    grid-column: 1 / -1;
+  }
 }

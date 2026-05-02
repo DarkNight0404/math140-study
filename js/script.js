@@ -111,10 +111,21 @@ computeBtn.addEventListener("click", () => {
 
   const result = computeEfficientRoute(start, dropOffs);
 
+  const legsText = result.legs
+    .map((leg, idx) => {
+      const routeText = leg.path.length ? leg.path.join(" → ") : "(no path)";
+      return `Leg ${idx + 1}: ${leg.from} → ${leg.to}\n` +
+             `  Path: ${routeText}\n` +
+             `  Distance: ${leg.distance.toFixed(5)} km\n`;
+    })
+    .join("\n");
+
   outputEl.textContent =
     `Starting Terminal: ${result.start}\n` +
     `Ending Terminal:   ${result.end}\n\n` +
-    `Efficient Route:   ${JSON.stringify(result.finalRoute)}\n` +
-    `Total Distance:    ${result.totalDistance.toFixed(5)} km\n` +
-    `Operating Cost:    Php ${result.cost.toFixed(2)}\n`;
+    `Efficient Route (stops): ${result.finalRoute.join(" → ")}\n` +
+    `Total Distance:         ${result.totalDistance.toFixed(5)} km\n` +
+    `Operating Cost:         Php ${result.cost.toFixed(2)}\n\n` +
+    `Shortest path per leg:\n` +
+    `${legsText}`;
 });

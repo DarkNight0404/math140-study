@@ -4,7 +4,6 @@ function pickGraph(start) {
   return start === "A" || start === "M" ? graph_from_dorm_as : graph_from_banwa;
 }
 
-
 function permutations(arr) {
   if (arr.length <= 1) return [arr.slice()];
   const out = [];
@@ -15,33 +14,55 @@ function permutations(arr) {
   return out;
 }
 
-export function dijkstra(start, end) {
+//dijkstra that returns both distance and the actual path
+export function dijkstraWithPath(start, end) {
   const graph = pickGraph(start);
 
   const dist = {};
-  for (const node of Object.keys(graph)) dist[node] = Infinity;
+  const prev = {};
+  for (const node of Object.keys(graph)) {
+    dist[node] = Infinity;
+    prev[node] = null;
+  }
   dist[start] = 0;
 
-  // priority queue (small inputs => simple array is ok)
   const pq = [{ d: 0, node: start }];
 
   while (pq.length) {
     pq.sort((a, b) => a.d - b.d);
     const { d, node } = pq.shift();
 
-    if (node === end) return d;
     if (d > dist[node]) continue;
+    if (node === end) break;
 
-    const neighbors = graph[node] ?? [];
-    for (const [nbr, w] of neighbors) {
+    for (const [nbr, w] of graph[node] ?? []) {
       const nd = d + w;
       if (nd < dist[nbr]) {
         dist[nbr] = nd;
+        prev[nbr] = node;
         pq.push({ d: nd, node: nbr });
       }
     }
   }
-  return Infinity;
+
+  if (!Number.isFinite(dist[end])) {
+    return { distance: Infinity, path: [] };
+  }
+
+  // reconstruct path end -> start using prev[]
+  const path = [];
+  let cur = end;
+  while (cur !== null) {
+    path.push(cur);
+    if (cur === start) break;
+    cur = prev[cur];
+  }
+  path.reverse();
+
+  // if we never reached start, then no valid path
+  if (path[0] !== start) return { distance: Infinity, path: [] };
+
+  return { distance: dist[end], path };
 }
 
 export function computeEfficientRoute(startingTerminal, dropOffs) {
@@ -52,33 +73,52 @@ export function computeEfficientRoute(startingTerminal, dropOffs) {
 
   for (const route of routes) {
     let distance = 0;
+
     for (let i = 1; i < route.length; i++) {
-      distance += dijkstra(route[i - 1], route[i]);
+      const { distance: legDist } = dijkstraWithPath(route[i - 1], route[i]);
+      distance += legDist;
     }
+
     if (distance < efficientDistance) {
       efficientDistance = distance;
       efficientRoute = route;
     }
   }
 
-  // returning to nearest terminal (your code uses A, M, S)
+  // choose nearest terminal at the end
   const terminals = ["A", "M", "S"];
   const last = efficientRoute[efficientRoute.length - 1];
 
   let nearestTerminal = terminals[0];
-  let nearestDistance = dijkstra(last, terminals[0]);
+  let nearestDistance = dijkstraWithPath(last, terminals[0]).distance;
 
   for (const t of terminals) {
-    const d = dijkstra(last, t);
+    const d = dijkstraWithPath(last, t).distance;
     if (d < nearestDistance) {
       nearestDistance = d;
       nearestTerminal = t;
     }
   }
 
-  const totalDistance = efficientDistance + nearestDistance;
   const finalRoute = [...efficientRoute, nearestTerminal];
+  const totalDistance = efficientDistance + nearestDistance;
   const cost = totalDistance * operatingCost;
 
-  return { finalRoute, totalDistance, cost, start: finalRoute[0], end: finalRoute[finalRoute.length - 1] };
+  //build the per-leg shortest path details
+  const legs = [];
+  for (let i = 1; i < finalRoute.length; i++) {
+    const from = finalRoute[i - 1];
+    const to = finalRoute[i];
+    const { distance, path } = dijkstraWithPath(from, to);
+    legs.push({ from, to, distance, path });
+  }
+
+  return {
+    finalRoute,
+    legs, // prints in UI
+    totalDistance,
+    cost,
+    start: finalRoute[0],
+    end: finalRoute[finalRoute.length - 1],
+  };
 }
