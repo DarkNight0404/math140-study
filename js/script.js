@@ -35,10 +35,7 @@ function renderOptionsForSelect(select, selectedSet) {
   const current = select.value;
 
   // Build options: allow the select's current value even if it's in selectedSet
-  const opts = [
-    { value: "", label: "— Select a drop-off —" },
-    ...POINTS,
-  ];
+  const opts = [{ value: "", label: "— Select a drop-off —" }, ...POINTS];
 
   select.innerHTML = ""; // reset
   for (const o of opts) {
@@ -100,6 +97,13 @@ function getDropoffsFromUI() {
     .filter(Boolean);
 }
 
+/** Vertex -> readable label (fallback to vertex if not found) */
+function makePointNameLookup(points) {
+  const map = new Map(points.map((p) => [p.value, p.label]));
+  return (v) => map.get(v) ?? v;
+}
+const pointName = makePointNameLookup(POINTS);
+
 computeBtn.addEventListener("click", () => {
   const start = terminalEl.value;
   const dropOffs = getDropoffsFromUI();
@@ -111,19 +115,30 @@ computeBtn.addEventListener("click", () => {
 
   const result = computeEfficientRoute(start, dropOffs);
 
-  const legsText = result.legs
+  const startName = pointName(result.start);
+  const endName = pointName(result.end);
+
+  const legsText = (result.legs ?? [])
     .map((leg, idx) => {
-      const routeText = leg.path.length ? leg.path.join(" → ") : "(no path)";
-      return `Leg ${idx + 1}: ${leg.from} → ${leg.to}\n` +
-             `  Path: ${routeText}\n` +
-             `  Distance: ${leg.distance.toFixed(5)} km\n`;
+      const fromName = pointName(leg.from);
+      const toName = pointName(leg.to);
+
+      const routeText = leg.path?.length
+        ? leg.path.map(pointName).join(" → ")
+        : "(no path)";
+
+      return (
+        `Leg ${idx + 1}: ${fromName} → ${toName}\n` +
+        `  Path: ${routeText}\n` +
+        `  Distance: ${leg.distance.toFixed(5)} km\n`
+      );
     })
     .join("\n");
 
   outputEl.textContent =
-    `Starting Terminal: ${result.start}\n` +
-    `Ending Terminal:   ${result.end}\n\n` +
-    `Efficient Route (stops): ${result.finalRoute.join(" → ")}\n` +
+    `Starting Terminal: ${startName} (${result.start})\n` +
+    `Ending Terminal:   ${endName} (${result.end})\n\n` +
+    `Efficient Route (stops): ${result.finalRoute.map(pointName).join(" → ")}\n` +
     `Total Distance:         ${result.totalDistance.toFixed(5)} km\n` +
     `Operating Cost:         Php ${result.cost.toFixed(2)}\n\n` +
     `Shortest path per leg:\n` +
